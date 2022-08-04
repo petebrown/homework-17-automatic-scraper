@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   # schedule/cron means run at this frequency
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '0 * * * *'
 jobs:
   scrape:
     # This is never likely to change
