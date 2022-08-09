@@ -185,43 +185,6 @@ for story in stories:
     articles.append(article)
 
 
-# # Get OPINIONS
-
-# In[43]:
-
-
-# opinion_section = doc.select_one('.sidebar')
-
-# section_title = opinion_section.select_one('.section-title').text.strip()
-
-# opinion_articles = opinion_section.select('li')
-
-# for article in opinion_articles:
-#     headline = article.select_one('h4 a').text.strip()
-    
-#     url = article.select_one('h4 a')['href']
-#     url = 'https://buckeyereporter.com' + url
-    
-#     author = article.select_one('.card-author a').text.strip()
-    
-#     author_url = article.select_one('.card-author a')['href']
-#     author_url = 'https://buckeyereporter.com' + author_url
-    
-#     article = {
-#         'section': section_title,
-#         'headline': headline,
-#         'url': url,
-#         'subsection': '',
-#         'subsection_url': '',
-#         'author': author,
-#         'author_url': author_url,
-#         'article_status': '',
-#         'preview_text': ''
-#     }
-
-#     articles.append(article)
-
-
 # # Get Sidebars (Opinions and Trending)
 
 # In[44]:
