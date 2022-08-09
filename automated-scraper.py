@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[35]:
 
 
 from bs4 import BeautifulSoup
 import pandas as pd
 import requests
+from urllib.parse import urljoin
 
 
-# In[2]:
+# In[36]:
 
 
 url = 'https://buckeyereporter.com/'
@@ -23,7 +24,7 @@ r = requests.get(url, headers=headers)
 doc = BeautifulSoup(r.text)
 
 
-# In[3]:
+# In[37]:
 
 
 articles = []
@@ -31,7 +32,7 @@ articles = []
 
 # # Get FEATURED SECTION
 
-# In[4]:
+# In[38]:
 
 
 main_section = doc.select_one('.main__part')
@@ -41,7 +42,7 @@ section_title = 'Featured'
 
 # ## Get top story
 
-# In[5]:
+# In[39]:
 
 
 top_story = main_section.select_one('.first-featured-title')
@@ -80,7 +81,7 @@ articles.append(article)
 
 # ## Get second story
 
-# In[6]:
+# In[40]:
 
 
 second_story = main_section.select_one('.second-featured-title')
@@ -119,7 +120,7 @@ articles.append(article)
 
 # ## Get other featured stories
 
-# In[7]:
+# In[41]:
 
 
 top_stories = main_section.select('div.news-preview')
@@ -159,7 +160,7 @@ for story in top_stories:
 
 # ## Get rest of featured stories
 
-# In[8]:
+# In[42]:
 
 
 stories = main_section.select('li a')
@@ -186,45 +187,90 @@ for story in stories:
 
 # # Get OPINIONS
 
-# In[9]:
+# In[43]:
 
 
-opinion_section = doc.select_one('.sidebar')
+# opinion_section = doc.select_one('.sidebar')
 
-section_title = opinion_section.select_one('.section-title').text.strip()
+# section_title = opinion_section.select_one('.section-title').text.strip()
 
-opinion_articles = opinion_section.select('li')
+# opinion_articles = opinion_section.select('li')
 
-if opinion_articles:
-    for article in opinion_articles:
-        headline = article.select_one('h4 a').text.strip()
-        
-        url = article.select_one('h4 a')['href']
-        url = 'https://buckeyereporter.com' + url
-        
-        author = article.select_one('.card-author a').text.strip()
-        
-        author_url = article.select_one('.card-author a')['href']
-        author_url = 'https://buckeyereporter.com' + author_url
-        
-        article = {
-            'section': section_title,
-            'headline': headline,
-            'url': url,
-            'subsection': '',
-            'subsection_url': '',
-            'author': author,
-            'author_url': author_url,
-            'article_status': '',
-            'preview_text': ''
-        }
+# for article in opinion_articles:
+#     headline = article.select_one('h4 a').text.strip()
+    
+#     url = article.select_one('h4 a')['href']
+#     url = 'https://buckeyereporter.com' + url
+    
+#     author = article.select_one('.card-author a').text.strip()
+    
+#     author_url = article.select_one('.card-author a')['href']
+#     author_url = 'https://buckeyereporter.com' + author_url
+    
+#     article = {
+#         'section': section_title,
+#         'headline': headline,
+#         'url': url,
+#         'subsection': '',
+#         'subsection_url': '',
+#         'author': author,
+#         'author_url': author_url,
+#         'article_status': '',
+#         'preview_text': ''
+#     }
 
-        articles.append(article)
+#     articles.append(article)
+
+
+# # Get Sidebars (Opinions and Trending)
+
+# In[44]:
+
+
+# Get SIDEBAR SECTIONS
+
+sidebar = doc.select_one('.sidebar')
+
+sidebar_sections = sidebar.select('.sidebar__part')
+
+for section in sidebar_sections:
+    section_name = section.select_one('.section-title')
+    if section_name:
+        section_title = section_name.text.strip()
+
+        section_stories = section.select('li')
+
+        for story in section_stories:
+            headline = story.select_one('a')['title']
+            url = story.select_one('a')['href']
+            url = 'https://buckeyereporter.com' + url
+            author = story.select_one('.card-author a')
+            if author:
+                author_url = author['href']
+                author_url = 'https://buckeyereporter.com' + url
+                author = author.text.strip()
+            else:
+                author_url = ''
+                author = ''
+
+            article = {
+                'section': section_title,
+                'headline': headline,
+                'url': url,
+                'subsection': '',
+                'subsection_url': '',
+                'author': author,
+                'author_url': author_url,
+                'article_status': '',
+                'preview_text': ''
+            }
+
+            articles.append(article)
 
 
 # # Get DATA POINTS
 
-# In[10]:
+# In[45]:
 
 
 data_points_section = doc.select_one('section.data-points')
@@ -261,7 +307,7 @@ for story in data_point_stories:
 
 # # Get LATEST NEWS
 
-# In[11]:
+# In[46]:
 
 
 latest_news = doc.select_one('section .main__part')
@@ -297,7 +343,7 @@ for story in latest_news_stories:
 
 # # Get 'NEWS' sections
 
-# In[12]:
+# In[47]:
 
 
 news_sections = doc.select('div.home-tag-news')
@@ -327,7 +373,7 @@ for news_section in news_sections:
         articles.append(article)
 
 
-# In[13]:
+# In[48]:
 
 
 df = pd.DataFrame(articles)
@@ -337,10 +383,4 @@ df = pd.DataFrame(articles)
 
 
 df.to_csv('scraped_articles.csv', index=False)
-
-
-# In[ ]:
-
-
-
 
